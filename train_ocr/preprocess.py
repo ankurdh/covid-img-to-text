@@ -1,6 +1,7 @@
 import cv2
 import logging
 import os
+from matplotlib import pyplot as plt
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
@@ -52,6 +53,9 @@ class Preprocessor():
         #        processed image to sample*_processed.jpg
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        cv2.imshow('image', img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         pass
 
     def _process_state(self, state, path):
