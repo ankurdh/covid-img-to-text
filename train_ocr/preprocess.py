@@ -47,6 +47,9 @@ class Preprocessor():
         :return: N/A
         """
         img = cv2.imread(path)
+        # TODO : Suchir to add image pre processing code here
+        #        After all the steps are done, you need to write the
+        #        processed image to sample*_processed.jpg
         pass
 
     def _process_state(self, state, path):
