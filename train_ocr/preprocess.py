@@ -38,7 +38,7 @@ class Preprocessor():
         """
         Read the image
 
-        Step 1: Convert image to grayscase
+        Step 1: Convert image to grayscale
         Step 2: Threshold image to remove random jitter
         Step 3: Remove vertical and horizontal lines
 
@@ -50,6 +50,8 @@ class Preprocessor():
         # TODO : Suchir to add image pre processing code here
         #        After all the steps are done, you need to write the
         #        processed image to sample*_processed.jpg
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         pass
 
     def _process_state(self, state, path):
