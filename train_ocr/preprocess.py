@@ -56,6 +56,11 @@ class Preprocessor():
         cv2.imshow('image', img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+        img = cv2.medianBlur(img, 5)
+        img = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,11,2)[1]
+        cv2.imshow('image', img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         pass
 
     def _process_state(self, state, path):
