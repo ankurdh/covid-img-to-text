@@ -1,5 +1,0 @@
-vega
-pandas
-pytesseract
-matplotlib
-opencv-python
