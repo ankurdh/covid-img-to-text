@@ -43,7 +43,6 @@ def ocr():
     i = cv2.imread(f_name)
     o = state(i)
     unprocessed, processed = o.parse()
-    print(processed)
     return Response(json.dumps(processed), status=201, mimetype='application/json')
 
 
