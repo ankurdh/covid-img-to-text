@@ -1,6 +1,7 @@
 import cv2
 import logging
 import os
+from PIL import Image
 from matplotlib import pyplot as plt
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -48,26 +49,57 @@ class Preprocessor():
         :return: N/A
         """
         img = cv2.imread(path)
-        # TODO : Suchir to add image pre processing code here
-        #        After all the steps are done, you need to write the
-        #        processed image to sample*_processed.jpg
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # adaptive gaussian much clearer, better details, than adaptive mean
+
+        # tested adaptive threshold with box size: 11, 25, 33, 39, 41, 51
+        # quality increases between 11-33, and decreases from 33-51
+        # decided to go with adaptive thresholding; compared with linear thresholding
+        # compared with tozero and otsu filters
+        # vertical and horizontal lines appear clearer with adaptive thresholding
+
+        # for the c-value, we tried: -7, 0, 1, 2, 3, 8, 10, 13
+        # 1, 2 were yielding best results, most amount of detail
+
+        thresh_img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 33, 1)
+
+        # cv2.imwrite('data/%s/sampleproccessed.png' % self.states[x], img)
+
+        # Length of contour
+        L = 15
+        # Thickness of the contour
+        T = 1
+        # Iterations
+        I = 2
+
+        # Remove horizontal
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (L, T))
+        detected_lines = cv2.morphologyEx(thresh_img, cv2.MORPH_OPEN, kernel, iterations=I)
+        h_cnts = cv2.findContours(detected_lines, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        h_cnts = h_cnts[0] if len(h_cnts) == 2 else h_cnts[1]
+
+        # Remove vertical
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (T, L))
+        detected_lines = cv2.morphologyEx(thresh_img, cv2.MORPH_OPEN, kernel, iterations=I)
+        v_cnts = cv2.findContours(detected_lines, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        v_cnts = v_cnts[0] if len(v_cnts) == 2 else v_cnts[1]
+
+        for c in h_cnts + v_cnts:
+            cv2.drawContours(img, [c], -1, (255, 255, 255), 4)
+
         cv2.imshow('image', img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-        img = cv2.medianBlur(img, 5)
-        img = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY,11,2)[1]
-        cv2.imshow('image', img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+
         pass
 
     def _process_state(self, state, path):
         logging.info('Processing state: %s' % state)
         samples = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         for sample in samples:
-            sample_path = os.path.join(path, sample)
+            sample_path = os.path.join(path,sample)
             logging.warning('Processing: %s' % sample_path)
             self._preprocess_image(sample_path)
 
