@@ -1,6 +1,7 @@
 import cv2
 import logging
 import os
+import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
 
@@ -65,8 +66,6 @@ class Preprocessor():
 
         thresh_img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 33, 1)
 
-        # cv2.imwrite('data/%s/sampleproccessed.png' % self.states[x], img)
-
         # Length of contour
         L = 15
         # Thickness of the contour
@@ -89,10 +88,13 @@ class Preprocessor():
         for c in h_cnts + v_cnts:
             cv2.drawContours(img, [c], -1, (255, 255, 255), 4)
 
-        cv2.imshow('image', img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # keeping iterations = 1 because anything else is further dilating it
+        # (2,2) and above is way to dilated, losing detail
+        # decided to go with (2,1), but both (2,1) and (1,2) are very close
+        # dilating removes the clutter
 
+        kernel = np.ones((2,1),np.uint8)
+        dilated_img = cv2.dilate(img,kernel,iterations =1)
         pass
 
     def _process_state(self, state, path):
