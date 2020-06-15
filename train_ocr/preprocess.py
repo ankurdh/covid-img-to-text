@@ -1,12 +1,11 @@
 import cv2
 import logging
 import os
-from PIL import Image
-from matplotlib import pyplot as plt
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
-class Preprocessor():
+
+class Preprocessor:
     """
     Define a methodology to parse all the samples from the states.
 
@@ -65,8 +64,6 @@ class Preprocessor():
 
         thresh_img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 33, 1)
 
-        # cv2.imwrite('data/%s/sampleproccessed.png' % self.states[x], img)
-
         # Length of contour
         L = 15
         # Thickness of the contour
@@ -89,17 +86,17 @@ class Preprocessor():
         for c in h_cnts + v_cnts:
             cv2.drawContours(img, [c], -1, (255, 255, 255), 4)
 
-        cv2.imshow('image', img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-        pass
+        d_name = os.path.dirname(path)
+        f_name = os.path.basename(path).replace('.jpg', '_processed.jpg')
+        f_name = os.path.join(d_name, f_name)
+        print("Saving: ", f_name)
+        cv2.imwrite(f_name, img)
 
     def _process_state(self, state, path):
         logging.info('Processing state: %s' % state)
         samples = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         for sample in samples:
-            sample_path = os.path.join(path,sample)
+            sample_path = os.path.join(path, sample)
             logging.warning('Processing: %s' % sample_path)
             self._preprocess_image(sample_path)
 
